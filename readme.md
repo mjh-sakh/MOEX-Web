@@ -16,7 +16,9 @@ Above is just a foundation to get data from MOEX. Next intentions are:
 - [ ] data export per stock
 - [x] web interface 
 - [ ] classic graphs (starting at 100% and then ups and downs)
+- [ ] saving portfolios 
 
 
 ## minor features
 - work day check or bypass so no empty data received from MOEX
+- change default dates to last work day and one year prior 
