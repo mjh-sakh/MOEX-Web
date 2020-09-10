@@ -16,6 +16,7 @@ Above is just a foundation to get data from MOEX. Next intentions are:
 - [ ] data export per stock
 - [x] web interface 
 - [ ] classic graphs (starting at 100% and then ups and downs)
+- [ ] saving portfolios 
 
 
 ## minor features
