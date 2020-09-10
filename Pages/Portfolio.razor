@@ -1,0 +1,82 @@
+@page "/"
+
+@using BlazorApp.Portfolio
+
+
+<h1>Stock Price Getter!</h1>
+<h2>Period</h2>
+<p><MatDatePicker @bind-Value="@startDate" Label="Start Date" Format="MMMM dd, yyyy"></MatDatePicker> <MatDatePicker @bind-Value="@endDate" Label="End Date" Format="MMMM dd, yyyy"></MatDatePicker></p>
+<h2>Stocks</h2>
+<p>
+    <MatTextField @bind-Value="@stockName" Label="Stock"></MatTextField>
+    <MatTextField @bind-Value="@stockValue" Label="Value"></MatTextField>
+    <MatButton Raised="true" OnClick="@AddDataClick">Add Stock to Portfolio</MatButton>
+</p>
+<p>Double click to delete stock</p>
+<p>
+    <MatTable Items="@stocks" class="mat-elevation-z5" ShowPaging="false" Striped="true" AllowSelection="true" OnRowDbClick="@DeleteStock">
+        <MatTableHeader>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Price at Start</th>
+            <th>Price at End</th>
+        </MatTableHeader>
+        <MatTableRow>
+            <td>@context.Name</td>
+            <td>@String.Format("${0:f2}", @context.Value)</td>
+            <td>@context.StartPrice</td>
+            <td>@context.EndPrice</td>
+        </MatTableRow>
+    </MatTable>
+</p>
+<p><MatButton Raised="true" OnClick="@GetDataAsync">Get Data!</MatButton> </p>
+<h2>Portfolio Results</h2>
+<p>Value at Start @String.Format($"{PortfolioStartValue:N1}")</p>
+<p>Value at End @String.Format($"{PortfolioEndValue:N1}")</p>
+<p>Change @String.Format($"{PortfolioEndValue /PortfolioStartValue:P1}")</p>
+
+
+@code
+{
+
+    public string stockName = "FXUS";
+    public double stockValue = 1;
+    public DateTime startDate = new DateTime(2020, 06, 15);
+    public DateTime endDate = new DateTime(2020, 08, 19);
+    public double price;
+    public List<Stock> stocks = new List<Stock>();
+    public double PortfolioStartValue;
+    public double PortfolioEndValue;
+
+    void AddDataClick(MouseEventArgs e)
+    {
+        AddData(stockName, stockValue);
+    }
+
+    public void AddData(string stockName, double stockValue)
+    {
+        stocks.Add(new Stock(stockName, stockValue));
+    }
+
+    public async Task GetDataAsync()
+    {
+        foreach (var stock in stocks)
+        {
+            GettingData.GetStockStartPriceAsync(stock, startDate);
+            GettingData.GetStockEndPriceAsync(stock, endDate);
+        }
+
+        PortfolioStartValue = stocks.Sum(item => item.Value);
+        PortfolioEndValue = stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
+
+    }
+
+    public void DeleteStock(object item)
+    {
+        var stock = item as Stock;
+        stocks.Remove(stock);
+    }
+
+    //protected override async Task OnInitializedAsync() => await GetDataAsync();
+
+}
