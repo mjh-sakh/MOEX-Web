@@ -7,15 +7,15 @@ Add each stock to the table, then hit 'get data' and output is provided in very 
 - final value
 - change in % 
 
-![snapshot.jpg]
+![snapshot](snapshot.jpg)
 
 # Plans
 Above is just a foundation to get data from MOEX. Next intentions are:
-- balancing with given frequency and fee
-- running and comparing multiple portfolio
-- data export per stock
+- [ ] balancing with given frequency and fee
+- [ ] running and comparing multiple portfolio
+- [ ] data export per stock
 - [x] web interface 
-- classic graphs (starting at 100% and then ups and downs)
+- [ ] classic graphs (starting at 100% and then ups and downs)
 
 
 ## minor features
