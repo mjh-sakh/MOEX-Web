@@ -48,13 +48,13 @@ namespace MOEX_web.Portfolio
             }
         }
 
-        public static async void GetStockStartPriceAsync(Stock stock, DateTime date)
+        public static async Task GetStockStartPriceAsync(Stock stock, DateTime date)
         {
             stock.StartDate = date;
             stock.StartPrice = await GetStockDataAsync(stock.Name, date);
         }
 
-        public static async void GetStockEndPriceAsync(Stock stock, DateTime date)
+        public static async Task GetStockEndPriceAsync(Stock stock, DateTime date)
         {
             stock.EndDate = date;
             stock.EndPrice = await GetStockDataAsync(stock.Name, date);

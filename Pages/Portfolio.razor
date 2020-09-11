@@ -60,8 +60,8 @@
     {
         foreach (var stock in stocks)
         {
-            GettingData.GetStockStartPriceAsync(stock, startDate);
-            GettingData.GetStockEndPriceAsync(stock, endDate);
+            await GettingData.GetStockStartPriceAsync(stock, startDate);
+            await GettingData.GetStockEndPriceAsync(stock, endDate);
         }
 
         PortfolioStartValue = stocks.Sum(item => item.Value);
@@ -72,11 +72,11 @@
     public void DeleteStock(object item) => stocks.Remove(item as Stock);
 
     public void SavePortfolioClick(MouseEventArgs e) => SavePortfolio(stocks);
-    public void SavePortfolio(List<Stock> stocks) => SavingData.PushDataToFile(stocks, PortfolioFile);
+    public async Task SavePortfolio(List<Stock> stocks) => await SavingData.PushDataToFileAsync(stocks, PortfolioFile);
 
-    public void LoadPortfolioClick(MouseEventArgs e)
+    public async Task LoadPortfolioClick(MouseEventArgs e)
     {
-        stocks = SavingData.LoadDataFromFile(PortfolioFile);
+        stocks = await SavingData.LoadDataFromFileAsync(PortfolioFile);
     }
 
     //protected override async Task OnInitializedAsync() => await GetDataAsync();
