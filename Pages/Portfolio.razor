@@ -23,7 +23,7 @@
         </MatTableHeader>
         <MatTableRow>
             <td>@context.Name</td>
-            <td>@String.Format("${0:f2}", @context.Value)</td>
+            <td>@String.Format($"{@context.Value:N1}")</td>
             <td>@context.StartPrice</td>
             <td>@context.EndPrice</td>
         </MatTableRow>
@@ -31,9 +31,9 @@
 </p>
 <p><MatButton Raised="true" OnClick="@GetDataAsync">Get Data!</MatButton> </p>
 <h2>Portfolio Results</h2>
-<p>Value at Start @String.Format($"{PortfolioStartValue:N1}")</p>
-<p>Value at End @String.Format($"{PortfolioEndValue:N1}")</p>
-<p>Change @String.Format($"{PortfolioEndValue /PortfolioStartValue:P1}")</p>
+<h3>Value at Start @String.Format($"{PortfolioStartValue:N1}")</h3>
+<h3>Value at End @String.Format($"{PortfolioEndValue:N1}")</h3>
+<h3>Change @String.Format($"{PortfolioEndValue /PortfolioStartValue:P1}")</h3>
 
 
 @code
@@ -48,15 +48,9 @@
     public double PortfolioStartValue;
     public double PortfolioEndValue;
 
-    void AddDataClick(MouseEventArgs e)
-    {
-        AddData(stockName, stockValue);
-    }
+    void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
 
-    public void AddData(string stockName, double stockValue)
-    {
-        stocks.Add(new Stock(stockName, stockValue));
-    }
+    public void AddData(string stockName, double stockValue) => stocks.Add(new Stock(stockName, stockValue));
 
     public async Task GetDataAsync()
     {
@@ -71,11 +65,7 @@
 
     }
 
-    public void DeleteStock(object item)
-    {
-        var stock = item as Stock;
-        stocks.Remove(stock);
-    }
+    public void DeleteStock(object item) => stocks.Remove(item as Stock);
 
     //protected override async Task OnInitializedAsync() => await GetDataAsync();
 
