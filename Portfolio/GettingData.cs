@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace BlazorApp.Portfolio
+namespace MOEX_web.Portfolio
 {
     public class Stock
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace BlazorApp.Portfolio
+namespace MOEX_web.Portfolio
 {
     public class RecordConverter : JsonConverter
     {

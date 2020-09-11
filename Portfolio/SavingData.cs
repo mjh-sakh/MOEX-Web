@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace BlazorApp.Portfolio
+namespace MOEX_web.Portfolio
 {
     public class SavingData
     {
