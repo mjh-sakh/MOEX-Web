@@ -22,5 +22,5 @@ Above is just a foundation to get data from MOEX. Next intentions are:
 
 
 ## minor features
-- work day check or bypass so no empty data received from MOEX
-- change default dates to last work day and one year prior 
+- [ ] work day check or bypass so no empty data received from MOEX
+- [x] change default dates to last work day and one year prior 
