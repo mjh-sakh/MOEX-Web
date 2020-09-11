@@ -18,6 +18,7 @@ Above is just a foundation to get data from MOEX. Next intentions are:
 - [ ] classic graphs (starting at 100% and then ups and downs)
 - [x] saving and loading a portfolio
 - [ ] save several portfolios and load selected 
+- [ ] move to client side app (wasp)
 
 
 ## minor features
