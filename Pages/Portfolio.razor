@@ -12,6 +12,7 @@
     <MatTextField @bind-Value="@stockValue" Label="Value"></MatTextField>
     <MatButton Raised="true" OnClick="@AddDataClick">Add Stock to Portfolio</MatButton>
 </p>
+<p><MatButton Raised="true" OnClick="@LoadPortfolioClick">Load Saved Portfolio</MatButton></p>
 <p>Double click to delete stock</p>
 <p>
     <MatTable Items="@stocks" class="mat-elevation-z5" ShowPaging="false" Striped="true" AllowSelection="true" OnRowDbClick="@DeleteStock">
@@ -29,7 +30,10 @@
         </MatTableRow>
     </MatTable>
 </p>
-<p><MatButton Raised="true" OnClick="@GetDataAsync">Get Data!</MatButton> </p>
+<p>
+    <MatButton Raised="true" OnClick="@GetDataAsync">Get Data</MatButton>
+    <MatButton Raised="true" OnClick="@SavePortfolioClick">Save Portfolio</MatButton>
+</p>
 <h2>Portfolio Results</h2>
 <h3>Value at Start @String.Format($"{PortfolioStartValue:N1}")</h3>
 <h3>Value at End @String.Format($"{PortfolioEndValue:N1}")</h3>
@@ -47,9 +51,9 @@
     public List<Stock> stocks = new List<Stock>();
     public double PortfolioStartValue;
     public double PortfolioEndValue;
+    private string PortfolioFile = @"Data\portfolio.json";
 
     void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
-
     public void AddData(string stockName, double stockValue) => stocks.Add(new Stock(stockName, stockValue));
 
     public async Task GetDataAsync()
@@ -66,6 +70,14 @@
     }
 
     public void DeleteStock(object item) => stocks.Remove(item as Stock);
+
+    public void SavePortfolioClick(MouseEventArgs e) => SavePortfolio(stocks);
+    public void SavePortfolio(List<Stock> stocks) => SavingData.PushDataToFile(stocks, PortfolioFile);
+
+    public void LoadPortfolioClick(MouseEventArgs e)
+    {
+        stocks = SavingData.LoadDataFromFile(PortfolioFile);
+    }
 
     //protected override async Task OnInitializedAsync() => await GetDataAsync();
 

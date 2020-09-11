@@ -44,8 +44,6 @@ namespace BlazorApp.Portfolio
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
                 return 0;
             }
         }
