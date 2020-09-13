@@ -19,7 +19,7 @@
         <MatTableHeader>
             <th>Name</th>
             <th>Value</th>
-            <th>Price at Start</th>
+            <th width="400px">Price at Start</th>
             <th>Price at End</th>
         </MatTableHeader>
         <MatTableRow>
@@ -35,10 +35,11 @@
     <MatButton Raised="true" OnClick="@SavePortfolioClick">Save Portfolio</MatButton>
 </p>
 <h2>Portfolio Results</h2>
-<h3>Value at Start @String.Format($"{PortfolioStartValue:N1}")</h3>
-<h3>Value at End @String.Format($"{PortfolioEndValue:N1}")</h3>
-<h3>Change @String.Format($"{PortfolioEndValue /PortfolioStartValue:P1}")</h3>
-
+<table>
+    <tr><td width="220px"><h3>Value at Start</h3></td><td><h3>@String.Format($"{PortfolioStartValue:N1}")</h3></td></tr>
+    <tr><td><h3>Value at End</h3></td><td><h3>@String.Format($"{PortfolioEndValue:N1}")</h3></td></tr>
+    <tr><td><h3>Change</h3></td><td><h3>@String.Format($"{PortfolioEndValue / PortfolioStartValue:P1}")</h3></td></tr>
+</table>
 
 @code
 {
@@ -58,11 +59,13 @@
 
     public async Task GetDataAsync()
     {
+        var runningRequests = new List<Task>();
         foreach (var stock in stocks)
         {
-            await GettingData.GetStockStartPriceAsync(stock, startDate);
-            await GettingData.GetStockEndPriceAsync(stock, endDate);
+            runningRequests.Add(GettingData.GetStockStartPriceAsync(stock, startDate));
+            runningRequests.Add(GettingData.GetStockEndPriceAsync(stock, endDate));
         }
+        await Task.WhenAll(runningRequests.ToArray());
 
         PortfolioStartValue = stocks.Sum(item => item.Value);
         PortfolioEndValue = stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
@@ -83,7 +86,11 @@
 
     private async Task SetDates()
     {
-        endDate = DateTime.Today.AddDays((1 - (int)DateTime.Today.DayOfWeek));
+        endDate = (int)DateTime.Today.DayOfWeek switch //setting it to past Monday
+        {
+            0 => DateTime.Today.AddDays(-6),
+            _ => DateTime.Today.AddDays((1 - (int)DateTime.Today.DayOfWeek)),
+        };
         startDate = endDate.AddDays(-365);
         startDate = startDate.AddDays((1 - (int)startDate.DayOfWeek));
     }
