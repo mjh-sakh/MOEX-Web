@@ -1,6 +1,5 @@
 ﻿using MOEX.Portfolio;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -49,12 +48,18 @@ namespace MOEX.Services
 
         public async Task GetStockStartPriceAsync(Stock stock, DateTime date)
         {
+            if (stock is null)
+                throw new ArgumentNullException(nameof(stock));
+
             stock.StartDate = date;
             stock.StartPrice = await GetStockDataAsync(stock.Name, date).ConfigureAwait(false);
         }
 
         public async Task GetStockEndPriceAsync(Stock stock, DateTime date)
         {
+            if (stock is null)
+                throw new ArgumentNullException(nameof(stock));
+
             stock.EndDate = date;
             stock.EndPrice = await GetStockDataAsync(stock.Name, date).ConfigureAwait(false);
         }
