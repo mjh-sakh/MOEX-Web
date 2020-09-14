@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject>MOEX_web.Program</StartupObject>
+    <StartupObject>MOEX.Program</StartupObject>
+    <RootNamespace>MOEX</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

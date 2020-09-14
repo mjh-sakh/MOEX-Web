@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MOEX.Services;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 
-namespace MOEX_web
+namespace MOEX
 {
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Keep instancing on startup object.")]
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -21,13 +19,12 @@ namespace MOEX_web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddTransient<HttpClient>();
+            services.AddTransient<HttpClient>(); // Add Http client to inject it in Moex or any other service for web calls
+            services.AddTransient<MoexService>(); // Add Moex service to inject it whenever it's needed to whatever object
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

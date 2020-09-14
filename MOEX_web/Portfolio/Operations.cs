@@ -1,54 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.IO;
-using Newtonsoft.Json;
-using System.Diagnostics;
+using System.Threading.Tasks;
 
 
-namespace MOEX_web.Portfolio
+namespace MOEX.Portfolio
 {
-    public static class GettingData
-    {
-        public static async Task<double> GetStockDataAsync(string stockName, DateTime date)
-        {
-            var client = new HttpClient() { BaseAddress = new Uri("http://iss.moex.com/iss/") };
-            DateTime fromDate = date;
-            DateTime tillDate = date.AddDays(1);
-            try
-            {
-                string requestHTTP = $"history/engines/stock/markets/shares/securities/{stockName}.json?from={fromDate:yyyy-MM-dd}&till={tillDate:yyyy-MM-dd}";
-                Trace.WriteLine(new Uri(client.BaseAddress, requestHTTP));
-                var response = await client.GetAsync(requestHTTP);
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<Data>();
-                    return result.History.Data.FirstOrDefault(x => x.Price > 0)?.Price ?? -1;
-                }
-                else
-                    throw new InvalidOperationException(response.ReasonPhrase);
-            }
-            catch (HttpRequestException e)
-            {
-                return -1;
-            }
-        }
-
-        public static async Task GetStockStartPriceAsync(Stock stock, DateTime date)
-        {
-            stock.StartDate = date;
-            stock.StartPrice = await GetStockDataAsync(stock.Name, date);
-        }
-
-        public static async Task GetStockEndPriceAsync(Stock stock, DateTime date)
-        {
-            stock.EndDate = date;
-            stock.EndPrice = await GetStockDataAsync(stock.Name, date);
-        }
-    }
-
     public static class SavingData
     {
         public static async Task PushDataToFileAsync(List<Stock> stocks, string portfolioName)
@@ -84,8 +41,6 @@ namespace MOEX_web.Portfolio
             AddDatesForBalancing(newStock, intervalMonths);
             return newStock;
         }
-
-
     }
 }
 
