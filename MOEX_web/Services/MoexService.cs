@@ -2,7 +2,9 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MOEX.Services
 {
@@ -23,13 +25,36 @@ namespace MOEX.Services
             Client.BaseAddress = new Uri("http://iss.moex.com/iss/");
         }
 
-        public async Task<double> GetStockDataAsync(string stockName, DateTime date)
+        /// <summary>
+        /// Build the query string for the API calls.
+        /// </summary>
+        /// <param name="parameters">The sequence of name/value tuples to build the query string for.</param>
+        /// <returns>The query string to add to the query portion of API urls.</returns>
+        private static string BuildQuery(params (string name, object value)[] parameters)
         {
-            DateTime fromDate = date;
-            DateTime tillDate = date.AddDays(1);
-            string requestHTTP = $"history/engines/stock/markets/shares/securities/{stockName}.json?from={fromDate:yyyy-MM-dd}&till={tillDate:yyyy-MM-dd}";
+            var query = new StringBuilder();
+            if (parameters.Length > 0)
+            {
+                query.Append('?'); // Query character is added automatically, no need to add it on caller
+                foreach (var (name, value) in parameters)
+                {
+                    if (query.Length > 1)
+                        query.Append('&');
+                    var formattedValue = value switch // Add here custom formats for other types if required
+                    {
+                        DateTime dateTime => $"{dateTime:yyyy-MM-dd}",
+                        _ => value?.ToString()
+                    };
+                    query.Append($"{name}={formattedValue}");
+                }
+            }
+            return HttpUtility.UrlEncode(query.ToString()); // Always encode part of Urls
+        }
 
-            var response = await Client.GetAsync(requestHTTP).ConfigureAwait(false);
+        public async Task<double> GetStockDataAsync(string stockName, DateTime? startsWith = null, DateTime? endsWith = null)
+        {
+            var query = BuildQuery(("from", startsWith), ("to", endsWith ?? startsWith?.AddDays(1)));
+            var response = await Client.GetAsync(new Uri($"history/engines/stock/markets/shares/securities/{stockName}.json{query}", UriKind.Relative)).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsAsync<Data>().ConfigureAwait(false);
