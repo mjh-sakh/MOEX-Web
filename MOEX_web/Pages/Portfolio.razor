@@ -1,11 +1,10 @@
 @page "/"
-
 @using MOEX_web.Portfolio
-
 
 <h1>Stock Price Getter!</h1>
 <h2>Period</h2>
 <p><MatDatePicker @bind-Value="@startDate" Label="Start Date" Format="MMMM dd, yyyy"></MatDatePicker> <MatDatePicker @bind-Value="@endDate" Label="End Date" Format="MMMM dd, yyyy"></MatDatePicker></p>
+
 <h2>Stocks</h2>
 <p>
     <MatTextField @bind-Value="@stockName" Label="Stock"></MatTextField>
@@ -15,6 +14,7 @@
     <MatButton Raised="true" OnClick="@AddDataClick">Add Stock to Portfolio</MatButton>
     <MatButton Raised="true" OnClick="@LoadPortfolioClick">Load Saved Portfolio</MatButton>
 </p>
+
 <p>Double click to delete stock</p>
 <p>
     <MatTable Items="@stocks" class="mat-elevation-z5" ShowPaging="false" Striped="true" AllowSelection="true" OnRowDbClick="@DeleteStock">
@@ -36,6 +36,7 @@
     <MatButton Raised="true" OnClick="@GetDataAsync">Get Data</MatButton>
     <MatButton Raised="true" OnClick="@SavePortfolioClick">Save Portfolio</MatButton>
 </p>
+
 <h2>Portfolio Results</h2>
 <table>
     <tr><td width="220px"><h3>Value at Start</h3></td><td><h3>@String.Format($"{portfolioStartValue:N1}")</h3></td></tr>
@@ -84,11 +85,11 @@
 
     public async Task LoadPortfolioClick(MouseEventArgs e) => stocks = await SavingData.LoadDataFromFileAsync(PortfolioFile);
 
-    protected override async Task OnInitializedAsync() => await SetDates();
-    private async Task SetDates()
+    protected override Task OnInitializedAsync()
     {
         endDate = DateTime.Today.AddDays(-2).SetToWorkDay();
         startDate = endDate.AddDays(-365).SetToWorkDay();
+        
+        return Task.CompletedTask;
     }
-
 }
