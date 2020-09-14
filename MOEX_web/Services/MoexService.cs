@@ -32,7 +32,6 @@ namespace MOEX.Services
             {
                 string requestHTTP = $"history/engines/stock/markets/shares/securities/{stockName}.json?from={fromDate:yyyy-MM-dd}&till={tillDate:yyyy-MM-dd}";
 
-                Trace.WriteLine(new Uri(Client.BaseAddress, requestHTTP));
                 var response = await Client.GetAsync(requestHTTP).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
