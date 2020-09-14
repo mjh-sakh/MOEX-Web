@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>MOEX_TestsXUnit</RootNamespace>
+    <RootNamespace>MOEX.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>

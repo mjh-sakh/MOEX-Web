@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MOEX_web.Portfolio
+namespace MOEX.Portfolio
 {
     public class RecordConverter : JsonConverter
     {

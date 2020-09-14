@@ -1,6 +1,6 @@
 using System;
 using Xunit;
-using MOEX_web.Portfolio;
+using MOEX.Portfolio;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -119,7 +119,7 @@ namespace MOEX_TestsXUnit
             var newStock = stock.AddDatesForBalancing(interval);
             Assert.True(newStock.History.Count > 2);
             
-            newStock.GetPricesAsync();
+            await newStock.GetPricesAsync();
             foreach (var record in newStock.History)
             {
                 Assert.True(record.Price != 0);

@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 
 
-namespace MOEX_web.Portfolio
+namespace MOEX.Portfolio
 {
     public static class GettingData
     {
