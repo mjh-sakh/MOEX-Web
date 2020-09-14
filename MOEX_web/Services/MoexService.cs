@@ -27,23 +27,16 @@ namespace MOEX.Services
         {
             DateTime fromDate = date;
             DateTime tillDate = date.AddDays(1);
-            try
-            {
-                string requestHTTP = $"history/engines/stock/markets/shares/securities/{stockName}.json?from={fromDate:yyyy-MM-dd}&till={tillDate:yyyy-MM-dd}";
+            string requestHTTP = $"history/engines/stock/markets/shares/securities/{stockName}.json?from={fromDate:yyyy-MM-dd}&till={tillDate:yyyy-MM-dd}";
 
-                var response = await Client.GetAsync(requestHTTP).ConfigureAwait(false);
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<Data>().ConfigureAwait(false);
-                    return result.History.Data.FirstOrDefault(x => x.Price > 0)?.Price ?? -1;
-                }
-                else
-                    throw new InvalidOperationException(response.ReasonPhrase);
-            }
-            catch (HttpRequestException e)
+            var response = await Client.GetAsync(requestHTTP).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
             {
-                return -1;
+                var result = await response.Content.ReadAsAsync<Data>().ConfigureAwait(false);
+                return result.History.Data.FirstOrDefault(x => x.Price > 0)?.Price ?? -1;
             }
+            else
+                throw new InvalidOperationException(response.ReasonPhrase);
         }
 
         public async Task GetStockStartPriceAsync(Stock stock, DateTime date)
@@ -68,7 +61,7 @@ namespace MOEX.Services
         {
             if (stock is null)
                 throw new ArgumentNullException(nameof(stock));
-            
+
             //var runningRequests = new List<Task>();
             foreach (var record in stock.History)
             {
