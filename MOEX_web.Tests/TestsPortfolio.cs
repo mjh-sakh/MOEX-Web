@@ -114,9 +114,11 @@ namespace MOEX_TestsXUnit
         {
             var stock = new Stock(name, value);
             await GettingData.GetStockStartPriceAsync(stock, DateTime.Today.AddDays(-365).SetToWorkDay());
-            await GettingData.GetStockEndPriceAsync(stock, DateTime.Today.SetToWorkDay());
+            await GettingData.GetStockEndPriceAsync(stock, DateTime.Today.AddDays(-2).SetToWorkDay());
 
             var newStock = stock.AddDatesForBalancing(interval);
+            Assert.True(newStock.History.Count > 2);
+            
             newStock.GetPricesAsync();
             foreach (var record in newStock.History)
             {
