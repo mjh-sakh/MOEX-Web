@@ -48,12 +48,12 @@ namespace MOEX.Services
                     query.Append($"{name}={formattedValue}");
                 }
             }
-            return HttpUtility.UrlEncode(query.ToString()); // Always encode part of Urls
+            return query.ToString(); // Always encode part of Urls
         }
 
         public async Task<double> GetStockDataAsync(string stockName, DateTime? startsWith = null, DateTime? endsWith = null)
         {
-            var query = BuildQuery(("from", startsWith), ("to", endsWith ?? startsWith?.AddDays(1)));
+            var query = BuildQuery(("from", startsWith), ("till", endsWith ?? startsWith?.AddDays(1)));
             var response = await Client.GetAsync(new Uri($"history/engines/stock/markets/shares/securities/{stockName}.json{query}", UriKind.Relative)).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
