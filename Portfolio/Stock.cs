@@ -33,7 +33,7 @@ public class StockRecord
     }
 
 }
-public static class RecordExtensions
+public static class StockExtension
 {
     public static void SortRecords(this List<StockRecord> records)
     {
