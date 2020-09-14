@@ -28,7 +28,7 @@
             <td>@context.StartPrice</td>
             <td>@context.EndPrice</td>
         </MatTableRow>
-    </MatTable>
+    </MatTable> 
 </p>
 <p>
     <MatButton Raised="true" OnClick="@GetDataAsync">Get Data</MatButton>
@@ -36,9 +36,9 @@
 </p>
 <h2>Portfolio Results</h2>
 <table>
-    <tr><td width="220px"><h3>Value at Start</h3></td><td><h3>@String.Format($"{PortfolioStartValue:N1}")</h3></td></tr>
-    <tr><td><h3>Value at End</h3></td><td><h3>@String.Format($"{PortfolioEndValue:N1}")</h3></td></tr>
-    <tr><td><h3>Change</h3></td><td><h3>@String.Format($"{PortfolioEndValue / PortfolioStartValue:P1}")</h3></td></tr>
+    <tr><td width="220px"><h3>Value at Start</h3></td><td><h3>@String.Format($"{portfolioStartValue:N1}")</h3></td></tr>
+    <tr><td><h3>Value at End</h3></td><td><h3>@String.Format($"{portfolioEndValue:N1}")</h3></td></tr>
+    <tr><td><h3>Change</h3></td><td><h3>@String.Format($"{portfolioEndValue / portfolioStartValue:P1}")</h3></td></tr>
 </table>
 
 @code
@@ -50,8 +50,8 @@
     public DateTime endDate;
     public double price;
     public List<Stock> stocks = new List<Stock>();
-    public double PortfolioStartValue;
-    public double PortfolioEndValue;
+    public double portfolioStartValue;
+    public double portfolioEndValue;
     private string PortfolioFile = @"Data\portfolio.json";
 
     void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
@@ -67,8 +67,8 @@
         }
         await Task.WhenAll(runningRequests.ToArray());
 
-        PortfolioStartValue = stocks.Sum(item => item.Value);
-        PortfolioEndValue = stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
+        portfolioStartValue = stocks.Sum(item => item.Value);
+        portfolioEndValue = stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
 
     }
 
