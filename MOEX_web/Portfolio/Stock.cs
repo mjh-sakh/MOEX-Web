@@ -102,16 +102,5 @@ namespace MOEX.Portfolio
             History.Add(new StockRecord(date, 0));
             History.SortRecords();
         }
-
-        public async Task GetPricesAsync(bool onlyForEmpty = true)
-        {
-            //var runningRequests = new List<Task>();
-            foreach (var record in History)
-            {
-                if (onlyForEmpty && record.Price <= 0) record.Price = await GettingData.GetStockDataAsync(Name, record.Date);
-                if (!onlyForEmpty) record.Price = await GettingData.GetStockDataAsync(Name, record.Date);
-            }
-        }
-
     }
 }

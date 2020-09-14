@@ -3,11 +3,16 @@ using Xunit;
 using MOEX.Portfolio;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net.Http;
+using MOEX.Services;
 
 namespace MOEX_TestsXUnit
 {
     public class Tests
     {
+        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly MoexService moexService = new MoexService(httpClient);
+
         [Theory]
         [InlineData("MOEX", 1)]
         public void TestStockProperties(string name, double value)
@@ -33,8 +38,8 @@ namespace MOEX_TestsXUnit
             Assert.Equal(value, newStock.Value);
             Assert.Equal(name, newStock.Name);
 
-            await GettingData.GetStockStartPriceAsync(stock, date1);
-            await GettingData.GetStockEndPriceAsync(stock, date2);
+            await moexService.GetStockStartPriceAsync(stock, date1);
+            await moexService.GetStockEndPriceAsync(stock, date2);
             newStock = new StockWithHistory(stock);
             Assert.Equal(date1, newStock.History[0].Date);
             Assert.True(newStock.History[0].Price > 0);
@@ -50,13 +55,13 @@ namespace MOEX_TestsXUnit
             newStock.AddDate(date3);
             Assert.True(newStock.History[1].Date >= newStock.History[0].Date);
             Assert.True(newStock.History[2].Date >= newStock.History[1].Date);
-            await newStock.GetPricesAsync();
+            await moexService.GetPricesAsync(newStock);
             foreach (var record in newStock.History)
             {
                 Assert.True(record.Price != 0);
             }
 
-            await newStock.GetPricesAsync(false);
+            await moexService.GetPricesAsync(newStock, false);
             foreach (var record in newStock.History)
             {
                 Assert.True(record.Price != 0);
@@ -113,19 +118,19 @@ namespace MOEX_TestsXUnit
         public async Task BalancingTest(string name, double value, int interval)
         {
             var stock = new Stock(name, value);
-            await GettingData.GetStockStartPriceAsync(stock, DateTime.Today.AddDays(-365).SetToWorkDay());
-            await GettingData.GetStockEndPriceAsync(stock, DateTime.Today.AddDays(-2).SetToWorkDay());
+            await moexService.GetStockStartPriceAsync(stock, DateTime.Today.AddDays(-365).SetToWorkDay());
+            await moexService.GetStockEndPriceAsync(stock, DateTime.Today.AddDays(-2).SetToWorkDay());
 
             var newStock = stock.AddDatesForBalancing(interval);
             Assert.True(newStock.History.Count > 2);
-            
-            await newStock.GetPricesAsync();
+
+            await moexService.GetPricesAsync(newStock);
             foreach (var record in newStock.History)
             {
                 Assert.True(record.Price != 0);
             }
 
-            await newStock.GetPricesAsync(false);
+            await moexService.GetPricesAsync(newStock, false);
             foreach (var record in newStock.History)
             {
                 Assert.True(record.Price != 0);
