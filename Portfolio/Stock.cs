@@ -39,6 +39,20 @@ public static class RecordExtensions
     {
         records.Sort((rec1, rec2) => rec1.Date.CompareTo(rec2.Date));
     }
+
+        public static DateTime SetToPreviousWorkDay(this DateTime date)
+        {
+            date = date.AddDays(-1);
+            switch (date.DayOfWeek)
+            {
+                case DayOfWeek.Sunday:
+                    return date.AddDays(-2);
+                case DayOfWeek.Saturday:
+                    return date.AddDays(-1);
+                default:
+                    return date;
+            }
+        }
 }
 
 public class StockWithHistory : Stock

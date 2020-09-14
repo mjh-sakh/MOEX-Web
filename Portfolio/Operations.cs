@@ -32,7 +32,7 @@ namespace MOEX_web.Portfolio
             }
             catch (HttpRequestException e)
             {
-                return 0;
+                return -1;
             }
         }
 

@@ -28,7 +28,7 @@
             <td>@context.StartPrice</td>
             <td>@context.EndPrice</td>
         </MatTableRow>
-    </MatTable> 
+    </MatTable>
 </p>
 <p>
     <MatButton Raised="true" OnClick="@GetDataAsync">Get Data</MatButton>
@@ -66,10 +66,13 @@
             runningRequests.Add(GettingData.GetStockEndPriceAsync(stock, endDate));
         }
         await Task.WhenAll(runningRequests.ToArray());
+        CalcResults();
+    }
 
+    public void CalcResults()
+    {
         portfolioStartValue = stocks.Sum(item => item.Value);
         portfolioEndValue = stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
-
     }
 
     public void DeleteStock(object item) => stocks.Remove(item as Stock);
@@ -77,22 +80,13 @@
     public void SavePortfolioClick(MouseEventArgs e) => SavePortfolio(stocks);
     public async Task SavePortfolio(List<Stock> stocks) => await SavingData.PushDataToFileAsync(stocks, PortfolioFile);
 
-    public async Task LoadPortfolioClick(MouseEventArgs e)
-    {
-        stocks = await SavingData.LoadDataFromFileAsync(PortfolioFile);
-    }
+    public async Task LoadPortfolioClick(MouseEventArgs e) => stocks = await SavingData.LoadDataFromFileAsync(PortfolioFile);
 
     protected override async Task OnInitializedAsync() => await SetDates();
-
     private async Task SetDates()
     {
-        endDate = (int)DateTime.Today.DayOfWeek switch //setting it to past Monday
-        {
-            0 => DateTime.Today.AddDays(-6),
-            _ => DateTime.Today.AddDays((1 - (int)DateTime.Today.DayOfWeek)),
-        };
-        startDate = endDate.AddDays(-365);
-        startDate = startDate.AddDays((1 - (int)startDate.DayOfWeek));
+        endDate = DateTime.Today.SetToPreviousWorkDay();
+        startDate = endDate.AddDays(-365).SetToPreviousWorkDay();
     }
 
 }
