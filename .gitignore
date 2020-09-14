@@ -4,7 +4,11 @@
 /dist
 /tmp
 /bin
+/MOEX_web/bin
+/MOEX_web.Tests/bin
 /obj
+/MOEX_web/obj
+/MOEX_web.Tests/obj
 /out-tsc
 
 # dependencies
