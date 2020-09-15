@@ -9,7 +9,7 @@ using System.Web;
 namespace MOEX.Services
 {
     /// <summary>
-    /// The Moex service will provide the interaction between with Http layer and logic
+    /// The Moex service will provide the interaction between Http layer and logic
     /// </summary>
     public class MoexService
     {

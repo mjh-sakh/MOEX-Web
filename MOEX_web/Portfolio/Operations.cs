@@ -24,8 +24,16 @@ namespace MOEX.Portfolio
 
     public static class Balancing
     {
+        /// <summary>
+        /// Add dates between Start and End dates of the stock which will be later used for balancing.
+        /// Dates are added from start day by adding specified number of months. 
+        /// </summary>
+        /// <param name="stock">Stock where dates are added</param>
+        /// <param name="intervalMonths">Number of months between dates</param>
+        /// <returns>StockWithHistory with extra dates</returns>
         public static StockWithHistory AddDatesForBalancing(this StockWithHistory stock, int intervalMonths)
         {
+            // TODO: check if there are in-between dates already in the class, need decision either to wipe them or somehow mark it
             var balancingDate = stock.StartDate.AddMonths(intervalMonths);
             while (balancingDate < stock.EndDate)
             {
