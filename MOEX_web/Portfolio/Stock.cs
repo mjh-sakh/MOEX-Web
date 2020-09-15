@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace MOEX.Portfolio
@@ -76,11 +77,13 @@ namespace MOEX.Portfolio
             if (stock.StartPrice > 0)
             {
                 this.StartDate = stock.StartDate;
+                this.StartPrice = stock.StartPrice;
                 History.Add(new StockRecord(stock.StartDate, stock.StartPrice));
             }
             if (stock.EndPrice > 0)
             {
                 this.EndDate = stock.EndDate;
+                this.EndPrice = stock.EndPrice;
                 History.Add(new StockRecord(stock.EndDate, stock.EndPrice));
             }
         }
@@ -101,6 +104,47 @@ namespace MOEX.Portfolio
             date = date.IsWorkDay() ? date : date.SetToWorkDay(); // should I do this check here or not?
             History.Add(new StockRecord(date, 0));
             History.SortRecords();
+        }
+    }
+
+    public class Wallet
+    {
+        public List<StockWithHistory> WalletStocks { get; private set; } = new List<StockWithHistory>();
+        public DateTime StartWalletDate { get; private set; }
+        public double StartWalletValue { get; private set; }
+        public DateTime EndWalletDate { get; private set; }
+        public double EndWalletValue { get; private set; }
+
+        public Wallet() { }
+        public Wallet(Stock stock) => AddStock(stock);
+        public Wallet(StockWithHistory stock) => AddStock(stock);
+        public Wallet(List<StockWithHistory> stocks)
+        {
+            WalletStocks = stocks;
+            SetWalletDates();
+        }
+
+        public void AddStock(Stock stock) => AddStock(new StockWithHistory(stock));
+        public void AddStock(StockWithHistory stock)
+        {
+            WalletStocks.Add(stock);
+            SetWalletDates();
+        }
+
+        private void SetWalletDates()
+        {
+            var earliestStartDate = DateTime.Today;
+            var latestEndDate = new DateTime(1900, 1, 1);
+
+            foreach (var stock in WalletStocks)
+            {
+                earliestStartDate = earliestStartDate > stock.StartDate ? stock.StartDate : earliestStartDate;
+                latestEndDate = latestEndDate < stock.EndDate ? stock.EndDate : latestEndDate;
+            }
+
+            StartWalletDate = earliestStartDate;
+            EndWalletDate = latestEndDate;
+
         }
     }
 }

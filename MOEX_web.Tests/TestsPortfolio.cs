@@ -29,9 +29,9 @@ namespace MOEX_TestsXUnit
         public async Task WillDataMatchInStockHistory(string name, double value)
         {
             
-            var date1 = new DateTime(2020, 7, 17);
-            var date2 = new DateTime(2020, 8, 17);
-            var date3 = new DateTime(2020, 6, 17);
+            var date1 = new DateTime(2020, 7, 17).SetToWorkDay();
+            var date2 = new DateTime(2020, 8, 17).SetToWorkDay();
+            var date3 = new DateTime(2020, 6, 17).SetToWorkDay();
 
             var stock = new Stock(name, value);
             var newStock = new StockWithHistory(stock);
@@ -42,15 +42,21 @@ namespace MOEX_TestsXUnit
             await moexService.GetStockEndPriceAsync(stock, date2);
             newStock = new StockWithHistory(stock);
             Assert.Equal(date1, newStock.History[0].Date);
-            Assert.True(newStock.History[0].Price > 0);
-            Assert.Equal(date2, newStock.History[1].Date);
-            Assert.True(newStock.History[1].Price > 0);
             Assert.Equal(stock.StartDate, newStock.StartDate);
+            Assert.Equal(stock.StartPrice, newStock.History[0].Price);
+            Assert.Equal(stock.StartPrice, newStock.StartPrice);
+            Assert.Equal(date2, newStock.History[1].Date);
             Assert.Equal(stock.EndDate, newStock.EndDate);
+            Assert.Equal(stock.EndPrice, newStock.History[1].Price);
+            Assert.Equal(stock.EndPrice, newStock.EndPrice);
 
             newStock.SortDates();
             Assert.Equal(newStock.History[0].Date, newStock.StartDate);
-            Assert.Equal(newStock.History[^1].Date, newStock.EndDate);
+            Assert.Equal(stock.StartPrice, newStock.History[0].Price);
+            Assert.Equal(stock.StartPrice, newStock.StartPrice);
+            Assert.Equal(newStock.History[1].Date, newStock.EndDate);
+            Assert.Equal(stock.EndPrice, newStock.EndPrice);
+            Assert.Equal(stock.EndPrice, newStock.History[1].Price);
 
             newStock.AddDate(date3);
             Assert.True(newStock.History[1].Date >= newStock.History[0].Date);
@@ -58,13 +64,13 @@ namespace MOEX_TestsXUnit
             await moexService.GetPricesAsync(newStock);
             foreach (var record in newStock.History)
             {
-                Assert.True(record.Price != 0);
+                Assert.True(record.Price > 0);
             }
 
             await moexService.GetPricesAsync(newStock, false);
             foreach (var record in newStock.History)
             {
-                Assert.True(record.Price != 0);
+                Assert.True(record.Price > 0);
             }
         }
 
@@ -137,5 +143,30 @@ namespace MOEX_TestsXUnit
             }
         }
 
+        [Theory]
+        [InlineData("MOEX", 1, "FXRL", 2)]
+        public async Task WalletTest(string name1, double value1, string name2, double value2)
+        {
+            var rand = new Random();
+            var endDate = DateTime.Today.AddDays(rand.Next(-7, -3)).SetToWorkDay();
+            var startDate = endDate.AddMonths(rand.Next(-14, -2)).SetToWorkDay();
+            var interval = rand.Next(1, 6);
+            var stock1 = new Stock(name1, value1);
+            await moexService.GetStockStartPriceAsync(stock1, startDate);
+            await moexService.GetStockEndPriceAsync(stock1, endDate);
+            var stock2 = new Stock(name2, value2);
+            await moexService.GetStockStartPriceAsync(stock2, startDate);
+            await moexService.GetStockEndPriceAsync(stock2, endDate);
+
+            var wallet = new Wallet();
+            wallet.AddStock(stock2);
+            Assert.Equal(endDate, wallet.EndWalletDate);
+            Assert.Equal(startDate, wallet.StartWalletDate);
+
+            wallet.AddStock(stock1);
+            Assert.Equal(endDate, wallet.EndWalletDate);
+            Assert.Equal(startDate, wallet.StartWalletDate);
+
+        }
     }
 }

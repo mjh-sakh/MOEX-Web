@@ -23,6 +23,7 @@ namespace MOEX.Portfolio
     }
 
     public static class Balancing
+        // HACK: not sure how to deal with balancing stocks with different start and end dates
     {
         /// <summary>
         /// Add dates between Start and End dates of the stock which will be later used for balancing.
@@ -49,6 +50,7 @@ namespace MOEX.Portfolio
             AddDatesForBalancing(newStock, intervalMonths);
             return newStock;
         }
+
     }
 }
 
