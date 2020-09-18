@@ -1,13 +1,10 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Reflection.PortableExecutable;
-using System.Security.Policy;
-using System.Xml.Serialization;
-using MOEX.Services;
-using MathNet.Numerics.LinearAlgebra;
 
 namespace MOEX.Portfolio
 {
@@ -126,26 +123,8 @@ namespace MOEX.Portfolio
 
         private static Matrix<double> CalcInterestRatesForStocks(this Wallet wallet)
         {
-            if (false)
-            {
-                // really don't want to start async here, therefore some check that prices have been recieved from server is needed
-            }
-            var growthFactors = new Matrix<double>();
-            var line = new Matrix<double>();
-            foreach (var stock in wallet.Stocks)
-            {
-                line = CalcInterestRatesFromPrices(stock.CreateListOfPrices()); // creates 1 x (Stocks.Count - 1) matrix [P2/P1, P3/P2, .. , PN/PN-1]
-                growthFactors.AddLine(line);
-            }
-
+            var growthFactors = Matrix<double>.Build.DenseOfRows(wallet.Stocks.Select(s => s.CreateListOfPrices().Pairwise((x, y) => x / y)));
             return growthFactors;
-        }
-
-        private static Matrix<double> CalcInterestRatesFromPrices(List<double> prices)
-        {
-            // do some magic to create matrix of size 1 x (Stocks.Count - 1) where values are [P2/P1, P3/P2, .. , PN/PN-1]
-
-            return;
         }
     }
 }

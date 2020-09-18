@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
 namespace MOEX.Portfolio
 {
@@ -35,6 +33,23 @@ namespace MOEX.Portfolio
     }
     public static class StockExtension
     {
+        public static IEnumerable<TSource> Pairwise<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, TSource> func)
+            where TSource : struct
+        {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+            if (func is null)
+                throw new ArgumentNullException(nameof(func));
+
+            TSource? previous = null;
+            foreach (var element in source)
+            {
+                if (previous is TSource value)
+                    yield return func(value, element);
+                previous = element;
+            }
+        }
+
         public static void SortRecords(this List<StockRecord> records)
         {
             if (records is null)
@@ -201,6 +216,6 @@ namespace MOEX.Portfolio
         {
             // TODO: zip Dates and values
         }
-        
+
     }
 }
