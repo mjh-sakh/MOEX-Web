@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using Xunit;
 using MOEX.Portfolio;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net.Http;
 using MOEX.Services;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace MOEX_TestsXUnit
 {
@@ -303,21 +305,31 @@ namespace MOEX_TestsXUnit
             {
                 for (int jDate = 0; jDate < wallet.Stocks[0].History.Count; jDate++)
                 {
-                    wallet.Stocks[iStock].History[jDate].Price = 1.0 + rand.NextDouble() * 3000;
+                    wallet.Stocks[iStock].History[jDate].Price = (double)rand.Next(80, 120);
                 }
             }
             return wallet;
         }
 
+        [Fact]
+        public static void Pariwise_Runs()
+        {
+            var wallet = CreateSampleWalletWithPrices();
+            
+            var interestRates = Matrix<double>.Build.DenseOfRows(wallet.Stocks.Select(s => s.CreateListOfPrices().Pairwise((x, y) => x / y)));
+
+            Assert.True(true);
+        }
+        
         [Theory]
         [InlineData()]
-        public static void Wallet_CalcEndValue_()
+        public static void Wallet_CalcEndValue_Runs()
         {
             //arrange
             var wallet = CreateSampleWalletWithPrices();
 
             //act
-            //wallet.CalcStartValue();
+            wallet.CalcEndValue();
 
             //assert
             Assert.True(true);
