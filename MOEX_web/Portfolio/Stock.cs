@@ -105,7 +105,7 @@ namespace MOEX.Portfolio
             return list;
         }
 
-        public static List<double> CreateListOfValues(this Wallet wallet)
+        public static List<double> CreateListOfStockValues(this Wallet wallet)
         {
             if (wallet is null)
                 throw new ArgumentNullException(nameof(wallet));

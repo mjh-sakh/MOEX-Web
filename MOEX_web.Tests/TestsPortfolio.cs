@@ -249,7 +249,7 @@ namespace MOEX_TestsXUnit
             var wallet = CreateSampleWallet();
 
             //act
-            var list = wallet.CreateListOfValues();
+            var list = wallet.CreateListOfStockValues();
 
             //assert
             Assert.Equal(list.Count, wallet.Stocks.Count);
