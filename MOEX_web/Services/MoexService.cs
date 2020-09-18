@@ -1,5 +1,6 @@
 ﻿using MOEX.Portfolio;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -96,6 +97,35 @@ namespace MOEX.Services
                 if (!onlyForEmpty)
                     record.Price = await GetStockDataAsync(stock.Name, record.Date).ConfigureAwait(false);
             }
+        }
+
+        public async Task GetPricesAsync(Wallet wallet, bool onlyForEmpty = true)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            for (int i = 0; i < wallet.Stocks.Count; i++)
+            {
+                await GetPricesAsync(wallet.Stocks[i], onlyForEmpty).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<List<double>> CalcWalletValuesChange(Wallet wallet, DateTime startDate, DateTime endDate)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            var values = new List<double>();
+            double endValue;
+            var moexService = new MoexService(Client);
+            foreach (var stock in wallet.Stocks)
+            {
+                var getStartPrice = moexService.GetStockDataAsync(stock.Name, startDate);
+                var getEndPrice = moexService.GetStockDataAsync(stock.Name, endDate);
+                endValue = stock.Value * await getEndPrice.ConfigureAwait(false) / await getStartPrice.ConfigureAwait(false);
+                values.Add(endValue);
+            }
+            return values;
         }
     }
 }

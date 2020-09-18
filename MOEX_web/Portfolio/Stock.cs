@@ -37,21 +37,32 @@ namespace MOEX.Portfolio
     {
         public static void SortRecords(this List<StockRecord> records)
         {
+            if (records is null)
+                throw new ArgumentNullException(nameof(records));
+
             records.Sort((rec1, rec2) => rec1.Date.CompareTo(rec2.Date));
         }
 
         public static DateTime SetToWorkDay(this DateTime date)
         {
             //date = date.AddDays(-1);
-            switch (date.DayOfWeek)
+            //switch (date.DayOfWeek)
+            //{
+            //    case DayOfWeek.Sunday:
+            //        return date.AddDays(-2);
+            //    case DayOfWeek.Saturday:
+            //        return date.AddDays(-1);
+            //    default:
+            //        return date;
+            //}
+
+            date = date.DayOfWeek switch
             {
-                case DayOfWeek.Sunday:
-                    return date.AddDays(-2);
-                case DayOfWeek.Saturday:
-                    return date.AddDays(-1);
-                default:
-                    return date;
-            }
+                DayOfWeek.Sunday => date.AddDays(-2),
+                DayOfWeek.Saturday => date.AddDays(-1),
+                _ => date,
+            };
+            return date;
         }
 
         public static bool IsWorkDay(this DateTime date)
@@ -65,6 +76,46 @@ namespace MOEX.Portfolio
                     return true;
             }
         }
+
+        public static List<string> CreateListOfStocks(this Wallet wallet)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            var list = new List<string>();
+            foreach (var stock in wallet.Stocks)
+            {
+                list.Add(stock.Name);
+            }
+            return list;
+        }
+
+        public static List<double> CreateListOfValues(this Wallet wallet)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            var list = new List<double>();
+            foreach (var stock in wallet.Stocks)
+            {
+                list.Add(stock.Value);
+            }
+            return list;
+        }
+
+        public static List<double> CreateListOfPrices(this StockWithHistory stock)
+        {
+            if (stock is null)
+                throw new ArgumentNullException(nameof(stock));
+
+            var list = new List<double>();
+            foreach (var record in stock.History)
+            {
+                list.Add(record.Price);
+            }
+            return list;
+        }
+
     }
 
     public class StockWithHistory : Stock
@@ -74,6 +125,9 @@ namespace MOEX.Portfolio
         public StockWithHistory(string name, double value) : base(name, value) { }
         public StockWithHistory(Stock stock) : base(stock.Name, stock.Value)
         {
+            if (stock is null)
+                throw new ArgumentNullException(nameof(stock));
+
             if (stock.StartPrice > 0)
             {
                 this.StartDate = stock.StartDate;
@@ -109,42 +163,44 @@ namespace MOEX.Portfolio
 
     public class Wallet
     {
-        public List<StockWithHistory> WalletStocks { get; private set; } = new List<StockWithHistory>();
-        public DateTime StartWalletDate { get; private set; }
-        public double StartWalletValue { get; private set; }
-        public DateTime EndWalletDate { get; private set; }
-        public double EndWalletValue { get; private set; }
+        public List<StockWithHistory> Stocks { get; private set; } = new List<StockWithHistory>();
+        public DateTime StartDate { get; private set; }
+        public double StartValue { get; set; }
+        public DateTime EndDate { get; private set; }
+        public double EndValue { get; set; }
+        public List<StockRecord> History { get; private set; }
 
-        public Wallet() { }
+        //public Wallet() { }
         public Wallet(Stock stock) => AddStock(stock);
         public Wallet(StockWithHistory stock) => AddStock(stock);
         public Wallet(List<StockWithHistory> stocks)
         {
-            WalletStocks = stocks;
-            SetWalletDates();
+            Stocks = stocks;
+            //SetWalletDates();
         }
 
         public void AddStock(Stock stock) => AddStock(new StockWithHistory(stock));
         public void AddStock(StockWithHistory stock)
         {
-            WalletStocks.Add(stock);
-            SetWalletDates();
+            Stocks.Add(stock);
+            //SetWalletDates();
         }
 
-        private void SetWalletDates()
+        public void SetWalletDates(DateTime startDate, DateTime endDate)
         {
-            var earliestStartDate = DateTime.Today;
-            var latestEndDate = new DateTime(1900, 1, 1);
-
-            foreach (var stock in WalletStocks)
+            StartDate = startDate;
+            EndDate = endDate;
+            foreach (var stock in Stocks)
             {
-                earliestStartDate = earliestStartDate > stock.StartDate ? stock.StartDate : earliestStartDate;
-                latestEndDate = latestEndDate < stock.EndDate ? stock.EndDate : latestEndDate;
+                stock.StartDate = startDate;
+                stock.EndDate = endDate;
             }
-
-            StartWalletDate = earliestStartDate;
-            EndWalletDate = latestEndDate;
-
         }
+
+        public void WriteHistory(List<double> values)
+        {
+            // TODO: zip Dates and values
+        }
+        
     }
 }

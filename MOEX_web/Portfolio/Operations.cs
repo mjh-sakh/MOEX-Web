@@ -1,8 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
+using System.Reflection.PortableExecutable;
+using System.Security.Policy;
+using System.Xml.Serialization;
+using MOEX.Services;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace MOEX.Portfolio
 {
@@ -12,18 +17,18 @@ namespace MOEX.Portfolio
         {
             string jsonString;
             jsonString = JsonConvert.SerializeObject(stocks);
-            await File.WriteAllTextAsync(portfolioName, jsonString);
+            await File.WriteAllTextAsync(portfolioName, jsonString).ConfigureAwait(false);
         }
 
         public static async Task<List<Stock>> LoadDataFromFileAsync(string portfolioName)
         {
-            string jsonString = await File.ReadAllTextAsync(portfolioName);
+            string jsonString = await File.ReadAllTextAsync(portfolioName).ConfigureAwait(false);
             return JsonConvert.DeserializeObject<List<Stock>>(jsonString);
         }
     }
 
     public static class Balancing
-        // HACK: not sure how to deal with balancing stocks with different start and end dates
+    // HACK: not sure how to deal with balancing stocks with different start and end dates
     {
         /// <summary>
         /// Add dates between Start and End dates of the stock which will be later used for balancing.
@@ -35,13 +40,39 @@ namespace MOEX.Portfolio
         public static StockWithHistory AddDatesForBalancing(this StockWithHistory stock, int intervalMonths)
         {
             // TODO: check if there are in-between dates already in the class, need decision either to wipe them or somehow mark it
-            var balancingDate = stock.StartDate.AddMonths(intervalMonths);
-            while (balancingDate < stock.EndDate)
+            if (stock is null)
+                throw new ArgumentNullException(nameof(stock));
+            if (stock.StartDate == DateTime.MinValue || stock.EndDate == DateTime.MinValue)
+                throw new ArgumentNullException(nameof(stock)); // TODO: need to change type of exception thrown 
+
+            var balancingDate = stock.StartDate;
+            var endDate = stock.EndDate;
+            if (stock.History.Count != 0) // a bit ugly check if start and end dates are already in the set
+            {
+                balancingDate = stock.History[0].Date == stock.StartDate ? balancingDate.AddMonths(intervalMonths) : balancingDate;
+                endDate = (stock.History[0].Date == endDate || (stock.History.Count > 1 && stock.History[^1].Date == endDate)) ?
+                    endDate.AddSeconds(-1) : endDate;
+            }
+            while (balancingDate <= endDate)
             {
                 stock.AddDate(balancingDate);
+                if (balancingDate == stock.EndDate) break;
                 balancingDate = balancingDate.AddMonths(intervalMonths);
+                balancingDate = balancingDate > stock.EndDate ? stock.EndDate : balancingDate;
             }
             return stock;
+        }
+
+        public static Wallet AddDatesForBalancing(this Wallet wallet, int intervalMonths)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            for (int i = 0; i < wallet.Stocks.Count; i++)
+            {
+                wallet.Stocks[i] = wallet.Stocks[i].AddDatesForBalancing(intervalMonths);
+            }
+            return wallet;
         }
 
         public static StockWithHistory AddDatesForBalancing(this Stock stock, int intervalMonths)
@@ -51,80 +82,67 @@ namespace MOEX.Portfolio
             return newStock;
         }
 
+        public static void CalcStartValue(this Wallet wallet)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            wallet.StartValue = 0;
+            foreach (var stock in wallet.Stocks)
+            {
+                wallet.StartValue += stock.Value;
+            }
+
+        }
+
+        public static void CalcEndValue(this Wallet wallet)
+        {
+            if (wallet is null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            if (wallet.StartValue == 0) wallet.CalcStartValue();
+            var values = new List<double>() { wallet.StartValue };
+            var walletInterestRates = wallet.CalcInterestRatesForWallet();
+            foreach (var i in walletInterestRates) values.Add(values[^1] * i);
+
+            wallet.EndValue = values[^1];
+            wallet.WriteHistory(values);
+        }
+
+        private static List<double> CalcInterestRatesForWallet(this Wallet wallet)
+        {
+            var values = new List<double>();
+
+            var targetStockValues = wallet.CreateListOfValues(); // fraction of S1.V : S2.V : .. : SN.V should be restored after each rebalance
+            var stocksGrowthFactors = wallet.CalcInterestRatesForStocks();
+            // values[matrix of size 1 x  (Stock[any].History.Count - 1)]  =
+            //  = targetStockValues[matrix of size 1 x Stocks.Count] dot stocksGrowthFactors[matrix of size Stocks.Count x (Stock[any].History.Count - 1)]
+            // values.toList()
+
+            return values;
+        }
+
+        private static Matrix<double> CalcInterestRatesForStocks(this Wallet wallet)
+        {
+            if (false)
+            {
+                // really don't want to start async here, therefore some check that prices have been recieved from server is needed
+            }
+            var growthFactors = new Matrix<double>();
+            var line = new Matrix<double>();
+            foreach (var stock in wallet.Stocks)
+            {
+                line = CalcInterestRatesFromPrices(stock.CreateListOfPrices()); // creates 1 x (Stocks.Count - 1) matrix [P2/P1, P3/P2, .. , PN/PN-1]
+                growthFactors.AddLine(line);
+            }
+
+            return growthFactors;
+        }
+
+        private static Matrix<double> CalcInterestRatesFromPrices(List<double> prices)
+        {
+            // do some magic 
+            return;
+        }
     }
 }
-
-        // public class Wallet
-        // {
-        //     public double StartValue { get; private set; }
-        //     public DateTime StartValueDate { get; private set; }
-        //     public double EndValue { get; private set; }
-        //     public DateTime EndValueDate { get; private set; }
-        //     public Dictionary<string, double> Stocks { get; private set; }
-
-        //     public Wallet()
-        //     {
-        //         Stocks = new Dictionary<string, double>();
-        //     }
-
-        //     public void AddStock(string stockName, double size)
-        //     {
-        //         Stocks.Add(stockName, size);
-        //         CalcStartValue();
-        //     }
-
-        //     private void CalcStartValue()
-        //     {
-        //         StartValue = 0;
-        //         foreach ((_, double size) in Stocks)
-        //         {
-        //             StartValue += size;
-        //         }
-        //     }
-
-        //     public async Task CalcEndValue(DateTime startDay, DateTime endDay)
-        //     {
-        //         StartValueDate = startDay;
-
-        //         EndValueDate = endDay;
-
-        //         EndValue = 0;
-        //         foreach ((string stockName, double size) in Stocks)
-        //         {
-        //             Console.WriteLine($"Start date: {startDay}");
-        //             var startPrice = await GetStockData(stockName, startDay);
-        //             Console.WriteLine($"{stockName}: start price {startPrice}");
-        //             Console.WriteLine($"End date: {endDay}");
-        //             var endPrice = await GetStockData(stockName, endDay);
-        //             Console.WriteLine($"{stockName}: end price {endPrice}");
-        //             EndValue += endPrice / startPrice * size;
-        //         }
-        //     }
-        // }
-
-        // static async Task Main(string[] args)
-        // {
-        //     // DateTime startDay;
-        //     // DateTime endDay;
-        //     // Wallet wallet = new Wallet();
-
-        //     // var path = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + @"\wallet.txt"; //for final
-        //     // // var path = @"..\..\..\wallet.txt"; //for debugging vs
-        //     // // var path = @"wallet.txt"; //for debugging vscode
-        //     // using (var file = new StreamReader(path))
-        //     // {
-        //     //     startDay = DateTime.Parse(file.ReadLine());
-        //     //     endDay = DateTime.Parse(file.ReadLine());
-        //     //     while (file.ReadLine() is string line)
-        //     //     {
-        //     //         string[] stock = line.Split(" ");
-        //     //         wallet.AddStock(stock[0], double.Parse(stock[1]));
-        //     //     }
-        //     // }
-
-        //     // await wallet.CalcEndValue(startDay, endDay);
-
-        //     // Console.WriteLine($"Start value: {wallet.StartValue:N1}");
-        //     // Console.WriteLine($"End value: {wallet.EndValue:N1}");
-        //     // Console.WriteLine($"Change:\t{wallet.EndValue / wallet.StartValue:P1}");
-        // }
