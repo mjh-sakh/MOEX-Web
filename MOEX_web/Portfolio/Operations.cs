@@ -143,7 +143,8 @@ namespace MOEX.Portfolio
 
         private static Matrix<double> CalcInterestRatesFromPrices(List<double> prices)
         {
-            // do some magic 
+            // do some magic to create matrix of size 1 x (Stocks.Count - 1) where values are [P2/P1, P3/P2, .. , PN/PN-1]
+
             return;
         }
     }
