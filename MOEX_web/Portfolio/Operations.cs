@@ -111,15 +111,17 @@ namespace MOEX.Portfolio
 
         private static List<double> CalcInterestRatesForWallet(this Wallet wallet)
         {
-            var values = new List<double>();
+            var rates = new List<double>();
 
-            var targetStockValues = wallet.CreateListOfValues(); // fraction of S1.V : S2.V : .. : SN.V should be restored after each rebalance
+            var targetWalletComposition = new List<double>();
+            // fraction of S1.V : S2.V : .. : SN.V should be restored after each rebalance
+            foreach (var value in wallet.CreateListOfValues()) targetWalletComposition.Add(value / wallet.StartValue);
             var stocksGrowthFactors = wallet.CalcInterestRatesForStocks();
-            // values[matrix of size 1 x  (Stock[any].History.Count - 1)]  =
-            //  = targetStockValues[matrix of size 1 x Stocks.Count] dot stocksGrowthFactors[matrix of size Stocks.Count x (Stock[any].History.Count - 1)]
-            // values.toList()
+            // rates[matrix of size: 1 x (Stock[any].History.Count - 1)]  =
+            //  = targetWalletComposition[matrix of size: 1 x Stocks.Count] dot stocksGrowthFactors[matrix of size: Stocks.Count x (Stock[any].History.Count - 1)]
+            // rates.toList()
 
-            return values;
+            return rates;
         }
 
         private static Matrix<double> CalcInterestRatesForStocks(this Wallet wallet)
