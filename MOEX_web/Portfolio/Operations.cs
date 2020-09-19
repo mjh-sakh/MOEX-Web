@@ -20,8 +20,7 @@ namespace MOEX.Portfolio
         public static async Task<List<StockWithHistory>> LoadDataFromFileAsync(string portfolioName)
         {
             var jsonString = await File.ReadAllTextAsync(portfolioName).ConfigureAwait(false);
-            var result = JsonConvert.DeserializeObject<List<StockWithHistory>>(jsonString);
-            return result;
+            return JsonConvert.DeserializeObject<List<StockWithHistory>>(jsonString);
         }
     }
 

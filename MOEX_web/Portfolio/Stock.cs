@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MOEX.Portfolio
 {
@@ -135,11 +136,13 @@ namespace MOEX.Portfolio
 
     public class StockWithHistory : Stock
     {
-        public List<StockRecord> History { get; private set; } = new List<StockRecord>();
+        public List<StockRecord> History { get; private set; }
 
         public StockWithHistory(string name, double value) : base(name, value) { }
         public StockWithHistory(Stock stock) : base(stock.Name, stock.Value)
         {
+            History = new List<StockRecord>();
+
             if (stock is null)
                 throw new ArgumentNullException(nameof(stock));
 
@@ -155,6 +158,15 @@ namespace MOEX.Portfolio
                 this.EndPrice = stock.EndPrice;
                 History.Add(new StockRecord(stock.EndDate, stock.EndPrice));
             }
+        }
+        [JsonConstructor]
+        public StockWithHistory(List<StockRecord> history, string name, double value, DateTime startDate, double startPrice, DateTime endDate, double endPrice) : base(name, value)
+        {
+            History = history;
+            StartDate = startDate;
+            StartPrice = startPrice;
+            EndDate = endDate;
+            EndPrice = endPrice;
         }
 
 
