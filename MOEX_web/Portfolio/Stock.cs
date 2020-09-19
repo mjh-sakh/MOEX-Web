@@ -185,7 +185,7 @@ namespace MOEX.Portfolio
         public double EndValue { get; set; }
         public List<StockRecord> History { get; private set; }
 
-        //public Wallet() { }
+        public Wallet() { }
         public Wallet(Stock stock) => AddStock(stock);
         public Wallet(StockWithHistory stock) => AddStock(stock);
         public Wallet(List<StockWithHistory> stocks)

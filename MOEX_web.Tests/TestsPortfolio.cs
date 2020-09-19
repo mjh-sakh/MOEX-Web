@@ -380,5 +380,16 @@ namespace MOEX_TestsXUnit
 
             Assert.True(true);
         }
+
+        [Theory]
+        [InlineData(@"Data\portfolio.json")]
+        public static async Task LoadingLoadDataFromFileAsync_Runs(string path)
+        {
+            var stocks = await SavingData.LoadDataFromFileAsync(path).ConfigureAwait(false);
+
+            var wallet = new Wallet(stocks);
+
+            Assert.True(true);
+        }
     }
 }

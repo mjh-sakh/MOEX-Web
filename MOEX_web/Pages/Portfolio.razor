@@ -19,7 +19,7 @@
 
 <p>Double click to delete stock</p>
 <p>
-    <MatTable Items="@stocks" class="mat-elevation-z5" ShowPaging="false" Striped="true" AllowSelection="true" OnRowDbClick="@DeleteStock">
+    <MatTable Items="@wallet.Stocks" class="mat-elevation-z5" ShowPaging="false" Striped="true" AllowSelection="true" OnRowDbClick="@DeleteStock">
         <MatTableHeader>
             <th>Name</th>
             <th>Value</th>
@@ -58,14 +58,15 @@
     public double portfolioStartValue;
     public double portfolioEndValue;
     private string PortfolioFile = @"Data\portfolio.json";
+    public Wallet wallet = new Wallet();
 
     void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
-    public void AddData(string stockName, double stockValue) => stocks.Add(new Stock(stockName, stockValue));
+    public void AddData(string stockName, double stockValue) => wallet.AddStock(new Stock(stockName, stockValue));
 
     public async Task GetDataAsync()
     {
         var runningRequests = new List<Task>();
-        foreach (var stock in stocks)
+        foreach (var stock in wallet.Stocks)
         {
             runningRequests.Add(moexService.GetStockStartPriceAsync(stock, startDate));
             runningRequests.Add(moexService.GetStockEndPriceAsync(stock, endDate));
@@ -76,16 +77,16 @@
 
     public void CalcResults()
     {
-        portfolioStartValue = stocks.Sum(item => item.Value);
-        portfolioEndValue = stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
+        portfolioStartValue = wallet.Stocks.Sum(item => item.Value);
+        portfolioEndValue = wallet.Stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
     }
 
-    public void DeleteStock(object item) => stocks.Remove(item as Stock);
+    public void DeleteStock(object item) => wallet.Stocks.Remove(item as StockWithHistory);
 
-    public void SavePortfolioClick(MouseEventArgs e) => Task.WaitAll(SavePortfolioAsync(stocks));
-    public async Task SavePortfolioAsync(List<Stock> stocks) => await SavingData.PushDataToFileAsync(stocks, PortfolioFile);
+    public void SavePortfolioClick(MouseEventArgs e) => Task.WaitAll(SavePortfolioAsync(wallet.Stocks));
+    public async Task SavePortfolioAsync(List<StockWithHistory> stocks) => await SavingData.PushDataToFileAsync(stocks, PortfolioFile);
 
-    public async Task LoadPortfolioClick(MouseEventArgs e) => stocks = await SavingData.LoadDataFromFileAsync(PortfolioFile);
+    public async Task LoadPortfolioClick(MouseEventArgs e) => wallet = new Wallet(await SavingData.LoadDataFromFileAsync(PortfolioFile));
 
     protected override Task OnInitializedAsync()
     {
