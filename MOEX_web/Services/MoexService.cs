@@ -97,6 +97,8 @@ namespace MOEX.Services
                 if (!onlyForEmpty)
                     record.Price = await GetStockDataAsync(stock.Name, record.Date).ConfigureAwait(false);
             }
+            stock.StartPrice = stock.History[0].Price;
+            stock.EndPrice = stock.History[^1].Price;
         }
 
         public async Task GetPricesAsync(Wallet wallet, bool onlyForEmpty = true)
@@ -104,10 +106,12 @@ namespace MOEX.Services
             if (wallet is null)
                 throw new ArgumentNullException(nameof(wallet));
 
+            var runningRequests = new List<Task>();
             for (int i = 0; i < wallet.Stocks.Count; i++)
             {
-                await GetPricesAsync(wallet.Stocks[i], onlyForEmpty).ConfigureAwait(false);
+                runningRequests.Add(GetPricesAsync(wallet.Stocks[i], onlyForEmpty));
             }
+            await Task.WhenAll(runningRequests.ToArray());
         }
 
         public async Task<List<double>> CalcWalletValuesChange(Wallet wallet, DateTime startDate, DateTime endDate)

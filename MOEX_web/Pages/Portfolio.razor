@@ -41,9 +41,9 @@
 
 <h2>Portfolio Results</h2>
 <table>
-    <tr><td width="220px"><h3>Value at Start</h3></td><td><h3>@String.Format($"{portfolioStartValue:N1}")</h3></td></tr>
-    <tr><td><h3>Value at End</h3></td><td><h3>@String.Format($"{portfolioEndValue:N1}")</h3></td></tr>
-    <tr><td><h3>Change</h3></td><td><h3>@String.Format($"{portfolioEndValue / portfolioStartValue:P1}")</h3></td></tr>
+    <tr><td width="220px"><h3>Value at Start</h3></td><td><h3>@String.Format($"{wallet.StartValue:N1}")</h3></td></tr>
+    <tr><td><h3>Value at End</h3></td><td><h3>@String.Format($"{wallet.EndValue:N1}")</h3></td></tr>
+    <tr><td><h3>Change</h3></td><td><h3>@String.Format($"{wallet.EndValue / wallet.StartValue:P1}")</h3></td></tr>
 </table>
 
 @code
@@ -65,20 +65,11 @@
 
     public async Task GetDataAsync()
     {
-        var runningRequests = new List<Task>();
-        foreach (var stock in wallet.Stocks)
-        {
-            runningRequests.Add(moexService.GetStockStartPriceAsync(stock, startDate));
-            runningRequests.Add(moexService.GetStockEndPriceAsync(stock, endDate));
-        }
-        await Task.WhenAll(runningRequests.ToArray());
-        CalcResults();
-    }
+        wallet.SetDates(startDate, endDate);
+        await moexService.GetPricesAsync(wallet);
+        wallet.CalcStartValue();
+        wallet.CalcEndValue();
 
-    public void CalcResults()
-    {
-        portfolioStartValue = wallet.Stocks.Sum(item => item.Value);
-        portfolioEndValue = wallet.Stocks.Sum(item => (item.Value * item.EndPrice / item.StartPrice));
     }
 
     public void DeleteStock(object item) => wallet.Stocks.Remove(item as StockWithHistory);
