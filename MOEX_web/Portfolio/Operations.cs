@@ -108,8 +108,6 @@ namespace MOEX.Portfolio
 
         private static List<double> CalcInterestRatesForWallet(this Wallet wallet)
         {
-            var rates = new List<double>();
-
             var targetWalletComposition = new List<double>();
             // fraction of Stock1.Value : S2.V : .. : SN.V should be restored after each rebalance
             foreach (var stockValue in wallet.CreateListOfStockValues()) targetWalletComposition.Add(stockValue / wallet.StartValue);
@@ -117,11 +115,7 @@ namespace MOEX.Portfolio
             tmp[0] = targetWalletComposition.ToArray();
             var targetComposition = Matrix<double>.Build.DenseOfRows(tmp);
             var stocksInterstRates = wallet.CalcInterestRatesForStocks();
-            // rates[matrix of size: 1 x (Stock[any].History.Count - 1)]  =
-            //  = targetWalletComposition[matrix of size: 1 x Stocks.Count] dot prodcut stocksInterstRates[matrix of size: Stocks.Count x (Stock[any].History.Count - 1)]
-            // rates.toList()
-
-            rates = (targetComposition * stocksInterstRates).ToArray().OfType<double>().ToList();
+            var rates = (targetComposition * stocksInterstRates).ToArray().OfType<double>().ToList();
 
             return rates;
         }

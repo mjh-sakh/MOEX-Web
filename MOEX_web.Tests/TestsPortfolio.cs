@@ -337,8 +337,9 @@ namespace MOEX_TestsXUnit
         }
 
         [Fact]
-        public static async Task Wallet_CalcEndValue_RunSingleStockWithStartAndEndDateOnly()
+        public static async Task Wallet_CalcEndValue_RunSingleStock()
         {
+            //arrange
             var stock = new Stock("MOEX", 1);
             var wallet = new Wallet(stock);
             var startDate = DateTime.Today.AddDays(-150).SetToWorkDay();
@@ -348,9 +349,36 @@ namespace MOEX_TestsXUnit
             await moexService.GetStockEndPriceAsync(stock, endDate);
             await moexService.GetPricesAsync(wallet);
 
+            //act
             wallet.CalcEndValue();
 
+            //assert
             Assert.Equal(stock.EndPrice / stock.StartPrice, wallet.EndValue);
+
+            //arrange
+            wallet = wallet.AddDatesForBalancing(1);
+            await moexService.GetPricesAsync(wallet);
+
+            //act
+            wallet.CalcEndValue();
+
+            //assert
+            Assert.Equal(stock.EndPrice / stock.StartPrice, wallet.EndValue, 10);
+        }
+
+        [Fact]
+        public static async Task Wallet_CalcEndValue_RunsMultipleStocksWithBalancing()
+        {
+            var wallet = CreateSampleWallet();
+            var startDate = DateTime.Today.AddDays(-150).SetToWorkDay();
+            var endDate = DateTime.Today.AddDays(-2).SetToWorkDay();
+            wallet.SetDates(startDate, endDate);
+            wallet.AddDatesForBalancing(2);
+            await moexService.GetPricesAsync(wallet);
+
+            wallet.CalcEndValue();
+
+            Assert.True(true);
         }
     }
 }

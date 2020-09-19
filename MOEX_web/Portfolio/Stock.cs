@@ -218,7 +218,13 @@ namespace MOEX.Portfolio
 
         public void WriteHistory(List<double> values)
         {
-            // TODO: zip Dates and values
+            if (values is null)
+                throw new ArgumentNullException(nameof(values));
+            if (values.Count != Stocks[0].History.Count)
+                throw new Exception($"Lenght of {nameof(values)} should be the the same as dates for Stocks");
+
+            History = new List<StockRecord>();
+            for (int i = 0; i < values.Count; i++) History.Add(new StockRecord(Stocks[0].History[i].Date, values[i]));
         }
 
     }
