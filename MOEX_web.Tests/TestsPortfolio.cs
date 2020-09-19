@@ -223,7 +223,7 @@ namespace MOEX_TestsXUnit
             var wallet = CreateSampleWallet();
 
             //act-assert
-            wallet.SetWalletDates(startDate, endDate);
+            wallet.SetDates(startDate, endDate);
 
             Assert.Equal(endDate, wallet.EndDate);
             Assert.Equal(startDate, wallet.StartDate);
@@ -265,7 +265,7 @@ namespace MOEX_TestsXUnit
             var wallet = CreateSampleWallet();
             var endDate = DateTime.Today.AddDays(rand.Next(-7, -3)).SetToWorkDay();
             var startDate = endDate.AddMonths(rand.Next(-14, -5)).SetToWorkDay();
-            wallet.SetWalletDates(startDate, endDate);
+            wallet.SetDates(startDate, endDate);
             var interval = rand.Next(1, 4);
 
             //act
@@ -282,7 +282,7 @@ namespace MOEX_TestsXUnit
             var wallet = CreateSampleWallet();
             var endDate = DateTime.Today.AddDays(rand.Next(-7, -3)).SetToWorkDay();
             var startDate = endDate.AddMonths(rand.Next(-14, -5)).SetToWorkDay();
-            wallet.SetWalletDates(startDate, endDate);
+            wallet.SetDates(startDate, endDate);
             var interval = rand.Next(1, 4);
             wallet = wallet.AddDatesForBalancing(interval);
 
@@ -298,7 +298,7 @@ namespace MOEX_TestsXUnit
             var wallet = CreateSampleWallet();
             var endDate = DateTime.Today.AddDays(rand.Next(-7, -3)).SetToWorkDay();
             var startDate = endDate.AddMonths(rand.Next(-14, -5)).SetToWorkDay();
-            wallet.SetWalletDates(startDate, endDate);
+            wallet.SetDates(startDate, endDate);
             var interval = rand.Next(1, 4);
             wallet = wallet.AddDatesForBalancing(interval);
             for (int iStock = 0; iStock < wallet.Stocks.Count; iStock++)
@@ -334,6 +334,23 @@ namespace MOEX_TestsXUnit
             //assert
             Assert.True(true);
 
+        }
+
+        [Fact]
+        public static async Task Wallet_CalcEndValue_RunSingleStockWithStartAndEndDateOnly()
+        {
+            var stock = new Stock("MOEX", 1);
+            var wallet = new Wallet(stock);
+            var startDate = DateTime.Today.AddDays(-150).SetToWorkDay();
+            var endDate = DateTime.Today.AddDays(-2).SetToWorkDay();
+            wallet.SetDates(startDate, endDate);
+            await moexService.GetStockStartPriceAsync(stock, startDate);
+            await moexService.GetStockEndPriceAsync(stock, endDate);
+            await moexService.GetPricesAsync(wallet);
+
+            wallet.CalcEndValue();
+
+            Assert.Equal(stock.EndPrice / stock.StartPrice, wallet.EndValue);
         }
     }
 }

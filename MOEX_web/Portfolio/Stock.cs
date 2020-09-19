@@ -143,13 +143,13 @@ namespace MOEX.Portfolio
             if (stock is null)
                 throw new ArgumentNullException(nameof(stock));
 
-            if (stock.StartPrice > 0)
+            if (stock.StartDate > DateTime.MinValue)
             {
                 this.StartDate = stock.StartDate;
                 this.StartPrice = stock.StartPrice;
                 History.Add(new StockRecord(stock.StartDate, stock.StartPrice));
             }
-            if (stock.EndPrice > 0)
+            if (stock.EndDate > DateTime.MinValue)
             {
                 this.EndDate = stock.EndDate;
                 this.EndPrice = stock.EndPrice;
@@ -201,14 +201,18 @@ namespace MOEX.Portfolio
             //SetWalletDates();
         }
 
-        public void SetWalletDates(DateTime startDate, DateTime endDate)
+        public void SetDates(DateTime startDate, DateTime endDate)
         {
             StartDate = startDate;
             EndDate = endDate;
-            foreach (var stock in Stocks)
+            for (int i = 0; i < Stocks.Count; i++)
             {
-                stock.StartDate = startDate;
-                stock.EndDate = endDate;
+                var tmpStock = new Stock(Stocks[i].Name, Stocks[i].Value)
+                {
+                    StartDate = startDate,
+                    EndDate = endDate,
+                };
+                Stocks[i] = new StockWithHistory(tmpStock);
             }
         }
 
