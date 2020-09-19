@@ -33,10 +33,17 @@
             <td>@context.EndPrice</td>
         </MatTableRow>
     </MatTable>
-</p> 
+    <MatButton Raised="true" OnClick="@SavePortfolioClick">Save Portfolio</MatButton>
+</p>
+<p>
+    <MatNumericUpDownField Label="Choose interval between balancing, months"
+                           @bind-Value=@balancingInterval
+                           DecimalPlaces=0
+                           Minimum=0 Maximum=18>
+    </MatNumericUpDownField>
+</p>
 <p>
     <MatButton Raised="true" OnClick="@GetDataAsync">Get Data</MatButton>
-    <MatButton Raised="true" OnClick="@SavePortfolioClick">Save Portfolio</MatButton>
 </p>
 
 <h2>Portfolio Results</h2>
@@ -55,6 +62,7 @@
     public DateTime endDate;
     private string PortfolioFile = @"Data\portfolio.json";
     public Wallet wallet = new Wallet();
+    public int balancingInterval = 0;
 
     void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
     public void AddData(string stockName, double stockValue) => wallet.AddStock(new Stock(stockName, stockValue));
@@ -62,6 +70,7 @@
     public async Task GetDataAsync()
     {
         wallet.SetDates(startDate, endDate);
+        if (balancingInterval > 0) wallet.AddDatesForBalancing(balancingInterval);
         await moexService.GetPricesAsync(wallet);
         wallet.CalcStartValue();
         wallet.CalcEndValue();
