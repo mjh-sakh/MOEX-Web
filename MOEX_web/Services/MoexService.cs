@@ -23,7 +23,7 @@ namespace MOEX.Services
         public MoexService(HttpClient client)
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
-            Client.BaseAddress = new Uri("http://iss.moex.com/iss/");
+            Client.BaseAddress = new Uri("https://iss.moex.com/iss/");
         }
 
         /// <summary>
