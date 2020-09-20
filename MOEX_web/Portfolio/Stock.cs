@@ -141,10 +141,10 @@ namespace MOEX.Portfolio
         public StockWithHistory(string name, double value) : base(name, value) { }
         public StockWithHistory(Stock stock) : base(stock.Name, stock.Value)
         {
-            History = new List<StockRecord>();
-
             if (stock is null)
                 throw new ArgumentNullException(nameof(stock));
+
+            History = new List<StockRecord>();
 
             if (stock.StartDate > DateTime.MinValue)
             {

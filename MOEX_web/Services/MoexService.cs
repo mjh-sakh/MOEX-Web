@@ -111,7 +111,7 @@ namespace MOEX.Services
             {
                 runningRequests.Add(GetPricesAsync(wallet.Stocks[i], onlyForEmpty));
             }
-            await Task.WhenAll(runningRequests.ToArray());
+            await Task.WhenAll(runningRequests.ToArray()).ConfigureAwait(false);
         }
 
         public async Task<List<double>> CalcWalletValuesChange(Wallet wallet, DateTime startDate, DateTime endDate)
