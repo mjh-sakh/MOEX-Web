@@ -12,14 +12,23 @@ namespace MOEX.Portfolio
     {
         public static async Task PushDataToFileAsync(List<StockWithHistory> stocks, string portfolioName)
         {
-            string jsonString;
-            jsonString = JsonConvert.SerializeObject(stocks);
+            var jsonString = GetJsonString(stocks);
             await File.WriteAllTextAsync(portfolioName, jsonString).ConfigureAwait(false);
         }
 
         public static async Task<List<StockWithHistory>> LoadDataFromFileAsync(string portfolioName)
         {
             var jsonString = await File.ReadAllTextAsync(portfolioName).ConfigureAwait(false);
+            return GetStockFromJsonString(jsonString);
+        }
+
+        public static string GetJsonString(List<StockWithHistory> stocks)
+        {
+            return JsonConvert.SerializeObject(stocks);
+        }
+
+        public static List<StockWithHistory> GetStockFromJsonString(string jsonString)
+        {
             return JsonConvert.DeserializeObject<List<StockWithHistory>>(jsonString);
         }
     }

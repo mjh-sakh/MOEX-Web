@@ -1,11 +1,12 @@
+using MOEX.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MOEX.Services;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Blazored.LocalStorage;
 
 namespace MOEX
 {
@@ -25,6 +26,7 @@ namespace MOEX
             services.AddServerSideBlazor();
             services.AddTransient<HttpClient>(); // Add Http client to inject it in Moex or any other service for web calls
             services.AddTransient<MoexService>(); // Add Moex service to inject it whenever it's needed to whatever object
+            services.AddBlazoredLocalStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

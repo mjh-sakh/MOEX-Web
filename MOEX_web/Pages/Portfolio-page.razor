@@ -3,6 +3,7 @@
 @inject MoexService moexService
 @using MOEX.Portfolio
 @using MatBlazor
+@inject Blazored.LocalStorage.ILocalStorageService localStore
 
 <h1>Stock Price Getter!</h1>
 <h2>Period</h2>
@@ -61,7 +62,7 @@
     public double stockValue = 1;
     public DateTime startDate;
     public DateTime endDate;
-    private string PortfolioFile = @"Data\portfolio.json";
+    private string PortfolioKey = @"portfolio-1";
     public Wallet wallet = new Wallet();
     public int balancingInterval = 0;
 
@@ -80,9 +81,22 @@
 
     public void DeleteStock(object item) => wallet.Stocks.Remove(item as StockWithHistory);
 
-    public async Task SavePortfolioClick(MouseEventArgs e) => await SavingData.PushDataToFileAsync(wallet.Stocks, PortfolioFile);
+    public async Task SavePortfolioClick(MouseEventArgs e)
+    {
+        await localStore.SetItemAsync(PortfolioKey, SavingData.GetJsonString(wallet.Stocks)).ConfigureAwait(false);
+    }
 
-    public async Task LoadPortfolioClick(MouseEventArgs e) => wallet = new Wallet(await SavingData.LoadDataFromFileAsync(PortfolioFile));
+    public async Task LoadPortfolioClick(MouseEventArgs e)
+    {
+        try
+        {
+            wallet = new Wallet(SavingData.GetStockFromJsonString(await localStore.GetItemAsync<string>(PortfolioKey).ConfigureAwait(false)));
+        }
+        catch (Exception)
+        {
+            /* TODO: need to design  proper 'no local storage yet' exception*/
+        }
+    }
 
     protected override Task OnInitializedAsync()
     {
