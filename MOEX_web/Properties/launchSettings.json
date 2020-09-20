@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:56003/",
+      "applicationUrl": "http://localhost:56003/MOEX-Web/",
       "sslPort": 44328
     }
   },
