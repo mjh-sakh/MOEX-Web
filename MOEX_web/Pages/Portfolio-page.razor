@@ -80,8 +80,7 @@
 
     public void DeleteStock(object item) => wallet.Stocks.Remove(item as StockWithHistory);
 
-    public void SavePortfolioClick(MouseEventArgs e) => Task.WaitAll(SavePortfolioAsync(wallet.Stocks));
-    public async Task SavePortfolioAsync(List<StockWithHistory> stocks) => await SavingData.PushDataToFileAsync(stocks, PortfolioFile);
+    public async Task SavePortfolioClick(MouseEventArgs e) => await SavingData.PushDataToFileAsync(wallet.Stocks, PortfolioFile);
 
     public async Task LoadPortfolioClick(MouseEventArgs e) => wallet = new Wallet(await SavingData.LoadDataFromFileAsync(PortfolioFile));
 
