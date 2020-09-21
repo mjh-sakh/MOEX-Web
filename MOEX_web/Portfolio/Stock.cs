@@ -25,6 +25,7 @@ namespace MOEX.Portfolio
     {
         public DateTime Date { get; private set; }
         public double Price { get; set; }
+        public double NormalizedPrice { get; set; }
 
         public StockRecord(DateTime date, double price)
         {
@@ -131,6 +132,21 @@ namespace MOEX.Portfolio
                 list.Add(record.Price);
             }
             return list;
+        }
+
+        public static List<StockRecord> Normalize(this List<StockRecord> history)
+        {
+            if (history is null)
+                throw new ArgumentNullException(nameof(history));
+
+            var startPrice = history[0].Price;
+
+            for (int i = 0; i < history.Count; i++)
+            {
+                history[i].NormalizedPrice = history[i].Price / startPrice;
+            }
+
+            return history;
         }
 
     }

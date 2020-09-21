@@ -91,6 +91,11 @@
         await moexService.GetPricesAsync(wallet);
         wallet.CalcStartValue();
         wallet.CalcEndValue();
+        wallet.History.Normalize();
+        foreach (var stock in wallet.Stocks)
+        {
+            stock.History.Normalize();
+        }
         this.StateHasChanged();
     }
 

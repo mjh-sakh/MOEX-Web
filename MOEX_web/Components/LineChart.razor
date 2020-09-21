@@ -5,16 +5,16 @@
     <div class="col-md-6 col-sm-12 p-4">
         <label>Smooth <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox></label>
         <RadzenChart>
-            <RadzenLineSeries Smooth="@smooth" Data="@wallet.History" CategoryProperty="Date" Title="wallet" LineType="LineType.Solid" ValueProperty="Price">
+            <RadzenLineSeries Smooth="@smooth" Data="@wallet.History" CategoryProperty="Date" Title="Wallet" LineType="LineType.Solid" ValueProperty="NormalizedPrice">
                 <RadzenMarkers MarkerType="MarkerType.Auto" />
             </RadzenLineSeries>
             @for (int i = 0; i < wallet.Stocks.Count; i++)
             {
-            <RadzenLineSeries Smooth="@smooth" Data="@wallet.Stocks[i].History" CategoryProperty="Date" Title="@wallet.Stocks[i].Name" ValueProperty="Price">
+            <RadzenLineSeries Smooth="@smooth" Data="@wallet.Stocks[i].History" CategoryProperty="Date" Title="@wallet.Stocks[i].Name" ValueProperty="NormalizedPrice">
                 <RadzenMarkers MarkerType="MarkerType.Auto" />
             </RadzenLineSeries>
             }
-            <RadzenCategoryAxis Padding="20" FormatString="{0:MMMYY}" />
+            <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
             <RadzenValueAxis Formatter="@Formatter">
                 <RadzenGridLines Visible="true" />
                 <RadzenAxisTitle Text="Price/Value" />
@@ -32,7 +32,7 @@
     
     string Formatter(object value)
     {
-        return ((double)value).ToString("N0");
+        return ((double)value).ToString("P0");
     }
 
 }
