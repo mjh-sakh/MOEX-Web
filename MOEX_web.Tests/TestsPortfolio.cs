@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using MOEX.Services;
 using MathNet.Numerics.LinearAlgebra;
+using MOEX;
 
 namespace MOEX_TestsXUnit
 {
@@ -388,6 +389,14 @@ namespace MOEX_TestsXUnit
             var stocks = await SavingData.LoadDataFromFileAsync(path).ConfigureAwait(false);
 
             var wallet = new Wallet(stocks);
+
+            Assert.True(true);
+        }
+
+        [Fact]
+        public static void BigRun()
+        {
+            Program.Main(new string[0]);
 
             Assert.True(true);
         }
