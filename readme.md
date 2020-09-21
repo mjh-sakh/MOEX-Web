@@ -1,5 +1,7 @@
 # About
-It is my study-project to learn C# and a bit of Web-Dev. 
+It is my study-project to learn C# and a bit of Web-Dev. It's deployed and functioning at [GitHub pages](https://mjh-sakh.github.io/MOEX-Web/). 
+
+My goal was to test out following Software Development things:
 - [x] наследование классов 
 - [ ] интерфейсы
 - [x] extension классы 
