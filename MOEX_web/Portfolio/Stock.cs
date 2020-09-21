@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace MOEX.Portfolio
@@ -15,7 +16,7 @@ namespace MOEX.Portfolio
 
         public Stock(string name, double value)
         {
-            Name = name;
+            Name = name.ToUpper();
             Value = value;
         }
     }
