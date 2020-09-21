@@ -34,7 +34,7 @@ Select balancing interval in months for portfolio and hit 'get data'.
 
 Results are presented in concise manner: 
 
-![run](media/run.jpg)
+![summary](media/summary.jpg)
 
 
 There is an option to show classic charts where interest rate is shown for entire portfolio and individual stocks. 
