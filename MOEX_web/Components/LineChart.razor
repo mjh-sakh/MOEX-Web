@@ -1,0 +1,38 @@
+﻿@namespace MOEX
+@using MOEX.Portfolio
+
+<div class="row">
+    <div class="col-md-6 col-sm-12 p-4">
+        <label>Smooth <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox></label>
+        <RadzenChart>
+            <RadzenLineSeries Smooth="@smooth" Data="@wallet.History" CategoryProperty="Date" Title="wallet" LineType="LineType.Solid" ValueProperty="Price">
+                <RadzenMarkers MarkerType="MarkerType.Auto" />
+            </RadzenLineSeries>
+            @for (int i = 0; i < wallet.Stocks.Count; i++)
+            {
+            <RadzenLineSeries Smooth="@smooth" Data="@wallet.Stocks[i].History" CategoryProperty="Date" Title="@wallet.Stocks[i].Name" ValueProperty="Price">
+                <RadzenMarkers MarkerType="MarkerType.Auto" />
+            </RadzenLineSeries>
+            }
+            <RadzenCategoryAxis Padding="20" FormatString="{0:MMMYY}" />
+            <RadzenValueAxis Formatter="@Formatter">
+                <RadzenGridLines Visible="true" />
+                <RadzenAxisTitle Text="Price/Value" />
+            </RadzenValueAxis>
+        </RadzenChart>
+    </div>
+</div>
+
+@code {
+
+    bool smooth = false;
+
+    [Parameter]
+    public Wallet wallet { get; set; }
+    
+    string Formatter(object value)
+    {
+        return ((double)value).ToString("N0");
+    }
+
+}

@@ -45,7 +45,7 @@
     </MatNumericUpDownField>
 </p>
 <p>
-    <MatButton Raised="true" OnClick="@GetDataAsync" Disabled="@StockAdded">Get Data</MatButton>
+    <MatButton Raised="true" OnClick="@GetDataAsync" Disabled="@NoStockAdded">Get Data</MatButton>
 </p>
 
 <h2>Portfolio Results</h2>
@@ -55,23 +55,33 @@
     <tr><td><h3>Change</h3></td><td><h3>@String.Format($"{wallet.EndValue / wallet.StartValue:P1}")</h3></td></tr>
 </table>
 
+<p></p>
+<p><MatButton Raised="true" OnClick="@ShowChart" Disabled="@NoStockAdded">@ShowChartButtonText</MatButton></p>
+@if (showChartToggle == true)
+{
+    <LineChart wallet=@wallet />
+}
+
+
 @code
 {
 
     public string stockName = "FXUS";
-    public double stockValue = 1;
+    public double stockValue = 100;
     public DateTime startDate;
     public DateTime endDate;
     private string PortfolioKey = @"portfolio-1";
     public Wallet wallet = new Wallet();
     public int balancingInterval = 0;
-    public bool StockAdded = true;
+    public bool NoStockAdded = true;
+    public bool showChartToggle = false;
+    public string ShowChartButtonText = "Show Chart";
 
     void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
     public void AddData(string stockName, double stockValue)
     {
         wallet.AddStock(new Stock(stockName, stockValue));
-        StockAdded = false;
+        CheckStocksCount();
     }
 
     public async Task GetDataAsync()
@@ -81,13 +91,13 @@
         await moexService.GetPricesAsync(wallet);
         wallet.CalcStartValue();
         wallet.CalcEndValue();
-
+        this.StateHasChanged();
     }
 
     public void DeleteStock(object item)
     {
         wallet.Stocks.Remove(item as StockWithHistory);
-        if (wallet.Stocks.Count == 0) StockAdded = true;
+        CheckStocksCount();
     }
 
     public async Task SavePortfolioClick(MouseEventArgs e)
@@ -100,7 +110,7 @@
         try
         {
             wallet = new Wallet(SavingData.GetStockFromJsonString(await localStore.GetItemAsync<string>(PortfolioKey).ConfigureAwait(false)));
-            if (wallet.Stocks.Count > 0) StockAdded = false;
+            CheckStocksCount();
         }
         catch (Exception)
         {
@@ -114,5 +124,25 @@
         startDate = endDate.AddDays(-365).SetToWorkDay();
 
         return Task.CompletedTask;
+    }
+
+    public void ShowChart()
+    {
+        showChartToggle = !showChartToggle;
+        ShowChartButtonText = showChartToggle ? "Hide Chart" : "Show Chart";
+    }
+
+    public void CheckStocksCount()
+    {
+        if (wallet.Stocks.Count > 0)
+        {
+            NoStockAdded = false;
+        }
+        else
+        {
+            NoStockAdded = true;
+            showChartToggle = false;
+            ShowChartButtonText = "Show Chart";
+        }
     }
 }
