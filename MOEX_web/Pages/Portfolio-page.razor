@@ -45,7 +45,7 @@
     </MatNumericUpDownField>
 </p>
 <p>
-    <MatButton Raised="true" OnClick="@GetDataAsync">Get Data</MatButton>
+    <MatButton Raised="true" OnClick="@GetDataAsync" Disabled="@StockAdded">Get Data</MatButton>
 </p>
 
 <h2>Portfolio Results</h2>
@@ -65,9 +65,14 @@
     private string PortfolioKey = @"portfolio-1";
     public Wallet wallet = new Wallet();
     public int balancingInterval = 0;
+    public bool StockAdded = true;
 
     void AddDataClick(MouseEventArgs e) => AddData(stockName, stockValue);
-    public void AddData(string stockName, double stockValue) => wallet.AddStock(new Stock(stockName, stockValue));
+    public void AddData(string stockName, double stockValue)
+    {
+        wallet.AddStock(new Stock(stockName, stockValue));
+        StockAdded = false;
+    }
 
     public async Task GetDataAsync()
     {
@@ -79,7 +84,11 @@
 
     }
 
-    public void DeleteStock(object item) => wallet.Stocks.Remove(item as StockWithHistory);
+    public void DeleteStock(object item)
+    {
+        wallet.Stocks.Remove(item as StockWithHistory);
+        if (wallet.Stocks.Count == 0) StockAdded = true;
+    }
 
     public async Task SavePortfolioClick(MouseEventArgs e)
     {
@@ -91,6 +100,7 @@
         try
         {
             wallet = new Wallet(SavingData.GetStockFromJsonString(await localStore.GetItemAsync<string>(PortfolioKey).ConfigureAwait(false)));
+            if (wallet.Stocks.Count > 0) StockAdded = false;
         }
         catch (Exception)
         {
