@@ -18,18 +18,27 @@ Balancing interval may be provided. In this case original proportion between sto
 
 # Use
 First, one need to select dates of period and add stocks one by one to portfolio with given value. There is an option to load previously saved portfolio (it's saved to browser storage, so each browser will have their own and information is not passed between them).
+
 ![input](media/input.jpg)
 
+
 Composition of portfolio will be shown in the table. Double-click on line will delete it. There is an option to save it. 
+
 ![portfolio](media/portfolio.jpg)
 
+
 Select balancing interval in months for portfolio and hit 'get data'.
+
 ![run](media/run.jpg)
+
 
 Results are presented in concise manner: 
+
 ![run](media/run.jpg)
 
+
 There is an option to show classic charts where interest rate is shown for entire portfolio and individual stocks. 
+
 ![charts](media/charts.jpg)
 
 # Plans
